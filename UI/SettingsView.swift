@@ -73,11 +73,12 @@ public struct SettingsView: View {
                 }
             }
             .padding(10)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(AppTheme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+            .shadow(color: AppTheme.shadowColor, radius: 4, x: 0, y: 2)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                    .stroke(Color.primary.opacity(0.05), lineWidth: 1)
             )
             VStack(alignment: .leading, spacing: 8) {
                 Text(L("shortcuts.title"))
@@ -96,11 +97,12 @@ public struct SettingsView: View {
                 }
             }
             .padding(10)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(AppTheme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+            .shadow(color: AppTheme.shadowColor, radius: 4, x: 0, y: 2)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                    .stroke(Color.primary.opacity(0.05), lineWidth: 1)
             )
             VStack(alignment: .leading, spacing: 8) {
                 Text(L("about.title"))
@@ -117,14 +119,17 @@ public struct SettingsView: View {
                 }
             }
             .padding(10)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(AppTheme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+            .shadow(color: AppTheme.shadowColor, radius: 4, x: 0, y: 2)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                    .stroke(Color.primary.opacity(0.05), lineWidth: 1)
             )
         }
         .padding(10)
+        .background(AppTheme.panelBackground)
+
         .frame(maxWidth: 360)
         .controlSize(.small)
         .onAppear { settings = settingsStore.load() }

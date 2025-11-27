@@ -237,12 +237,12 @@ private struct ItemCardView: View, Equatable {
     
             .frame(width: cardWidth, height: 220)
             .background(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
                     .fill(cardBackground)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
                     .stroke(borderColor, lineWidth: borderWidth)
             )
             .overlay(alignment: .topTrailing) {
@@ -256,7 +256,7 @@ private struct ItemCardView: View, Equatable {
                         .padding(6)
                 }
             }
-            .shadow(color: isSelected ? Color.accentColor.opacity(0.35) : .clear, radius: 6, x: 0, y: 0)
+            .shadow(color: isSelected ? headerPalette.main.opacity(0.4) : AppTheme.shadowColor, radius: isSelected ? 8 : AppTheme.shadowRadius, x: 0, y: isSelected ? 0 : AppTheme.shadowY)
             // .shadow(color: shadowColor, radius: hovering ? 8 : 4, x: 0, y: hovering ? 6 : 3)
             // .scaleEffect(hovering ? 1.03 : 1.0)
             // .onHover { hovering = $0 }
@@ -551,56 +551,34 @@ private struct ItemCardView: View, Equatable {
         case .color: return "paintpalette"
         }
     }
-    private var cardBackground: Color { Color.white }
-    private var borderColor: Color { isSelected ? Color.accentColor.opacity(0.85) : Color.primary.opacity(0.06) }
-    private var borderWidth: CGFloat { isSelected ? 2 : 0.8 }
-    private var shadowColor: Color { Color.black.opacity(0.15) }
+    private var themePalette: AppTheme.Palette {
+        if let bid = bundleID { return AppTheme.palette(for: bid) }
+        return AppTheme.purple
+    }
+    private var headerPalette: AppTheme.Palette {
+        if let bc = boardHeaderColor { return AppTheme.closestPalette(for: bc) }
+        return themePalette
+    }
+    private var cardBackground: Color { AppTheme.cardBackground }
+    private var borderColor: Color { isSelected ? headerPalette.main : Color.clear }
+    private var borderWidth: CGFloat { isSelected ? 2 : 0 }
+    private var shadowColor: Color { AppTheme.shadowColor }
     private var isSelected: Bool { selected }
     static func == (lhs: ItemCardView, rhs: ItemCardView) -> Bool {
         lhs.item == rhs.item && lhs.selected == rhs.selected && lhs.cardWidth == rhs.cardWidth
     }
     private var gradientColors: [Color] {
-        switch item.type {
-        case .text: return [Color.blue, Color.indigo]
-        case .link: return [Color.green, Color.teal]
-        case .image: return [Color.pink, Color.orange]
-        case .file: return [Color.gray, Color.blue]
-        case .color: return [Color.purple, Color.cyan]
-        }
+        // Use theme gradient colors but maybe varied slightly or just consistent
+        return [AppTheme.mainPurple, AppTheme.palePinkPurple]
     }
     private static var avgColorCache: [String: NSColor] = [:]
     private var headerColor: Color {
         if let c = boardHeaderColor { return c }
-        if let img = appIcon, let c = averageColorCached(for: img, key: bundleID) {
-            var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-            c.usingColorSpace(.deviceRGB)?.getHue(&h, saturation: &s, brightness: &b, alpha: &a)
-            let sAdj = min(max(s, 0.35), 0.55)
-            let bAdj = min(max(b, 0.78), 0.88)
-            let adj = NSColor(hue: h, saturation: sAdj, brightness: bAdj, alpha: 1.0)
-            return Color(adj)
-        }
-        switch item.type {
-        case .text: return .orange
-        case .link: return .green
-        case .image: return .pink
-        case .file: return .blue
-        case .color: return .purple
-        }
+        return AppTheme.mainPurple
     }
     private var headerGradient: LinearGradient {
-        if let bc = boardHeaderColor {
-            return LinearGradient(colors: [bc, bc.opacity(0.9)], startPoint: .topLeading, endPoint: .bottomTrailing)
-        }
-        if let img = appIcon, let c = averageColorCached(for: img, key: bundleID) {
-            var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-            c.usingColorSpace(.deviceRGB)?.getHue(&h, saturation: &s, brightness: &b, alpha: &a)
-            let sAdj = min(max(s, 0.85), 1.0)
-            let bAdj = min(max(b, 0.90), 1.0)
-            let c1 = NSColor(hue: h, saturation: min(sAdj + 0.05, 1.0), brightness: min(bAdj + 0.06, 1.0), alpha: 1)
-            let c2 = NSColor(hue: h, saturation: max(sAdj - 0.02, 0.88), brightness: max(bAdj - 0.06, 0.85), alpha: 1)
-            return LinearGradient(colors: [Color(c1), Color(c2)], startPoint: .topLeading, endPoint: .bottomTrailing)
-        }
-        return LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+        let p = headerPalette
+        return LinearGradient(colors: [p.main, p.secondary], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
     private var boardHeaderColor: Color? {
         guard let id = currentBoardID, id != defaultBoardID else { return nil }

@@ -97,8 +97,9 @@ struct PanelRootView: View {
                 }
                 .padding(.horizontal, 12)
                 .frame(height: 32)
-                .background(.thickMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .background(AppTheme.background)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius, style: .continuous))
+                .shadow(color: AppTheme.shadowColor, radius: 4, x: 0, y: 2)
                 .background(
                     GeometryReader { geo in
                         Color.clear
@@ -121,13 +122,22 @@ struct PanelRootView: View {
                                     .frame(width: 10, height: 10)
                                 Text(boardDisplayName(b))
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle((controller.selectedBoardID == b.id) ? .white : .primary)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background((controller.selectedBoardID == b.id) ? .thickMaterial : .ultraThinMaterial)
+                            .background(
+                                Group {
+                                    if controller.selectedBoardID == b.id {
+                                        AppTheme.highlightGradient
+                                    } else {
+                                        Color.clear
+                                    }
+                                }
+                            )
                             .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .contentShape(Rectangle())
                             .contextMenu {
                                 if b.id == controller.store.defaultBoardID {
                                     Text(L("panel.defaultBoard.uneditable"))
@@ -220,9 +230,10 @@ struct PanelRootView: View {
             }
             .padding(12)
             .frame(width: sidebarWidth)
+            .background(AppTheme.sidebarBackground)
             ZStack {
                 Rectangle()
-                    .fill(Color.secondary.opacity(0.25))
+                    .fill(Color.secondary.opacity(0.1))
                     .frame(width: 1)
                     .frame(maxHeight: .infinity)
             }
@@ -254,8 +265,10 @@ struct PanelRootView: View {
                         .animation(.easeInOut(duration: 0.35), value: layoutStyleRaw)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(AppTheme.panelBackground)
             }
         }
+        .background(AppTheme.panelBackground)
         .onAppear { controller.sidebarWidth = sidebarWidth }
         .onChange(of: sidebarWidth) { w in controller.sidebarWidth = w }
         .onChange(of: layoutStyleRaw) { _ in controller.panel.updateLayoutHeight(animated: true) }
@@ -297,3 +310,5 @@ struct PanelRootView: View {
     }
 }
 // 搜索弹窗视图已移除，统一由顶部按钮弹出
+
+

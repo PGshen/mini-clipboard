@@ -66,8 +66,8 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
             w.becomesKeyOnlyIfNeeded = true
             // HUD 材质效果与圆角
             let ev = NSVisualEffectView(frame: NSRect(x: 0, y: 0, width: targetWidth(), height: targetHeight()))
-            ev.material = .hudWindow
-            ev.blendingMode = .withinWindow
+            ev.material = .popover
+            ev.blendingMode = .behindWindow
             ev.state = .active
             ev.wantsLayer = true
             ev.layer?.cornerRadius = 16
