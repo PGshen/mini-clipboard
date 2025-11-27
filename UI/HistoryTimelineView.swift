@@ -339,7 +339,11 @@ private struct ItemCardView: View, Equatable {
             let h = CGFloat(isSelected ? 86 : 120)
             let previewPlain = (item.text ?? mainTitle)
             let base: String = {
-                if let u = item.contentRef, item.metadata["rich"] != "rtf", let full = loadPlainString(u) { return full }
+                if let t = item.text, !t.isEmpty { return t }
+                if let u = item.contentRef {
+                    if let a = loadAttributedString(u) { return a.string }
+                    if let s = loadPlainString(u) { return s }
+                }
                 return previewPlain
             }()
             if let u = asURL(base) {
@@ -514,7 +518,8 @@ private struct ItemCardView: View, Equatable {
     }
     private func truncatedPreview(_ s: String) -> String {
         let maxChars = 1200
-        let lines = s.split(separator: "\n", omittingEmptySubsequences: false)
+        let normalized = s.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
+        let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false)
         let firstLines = lines.prefix(10)
         var joined = firstLines.joined(separator: "\n")
         if joined.count > maxChars { joined = String(joined.prefix(maxChars)) }

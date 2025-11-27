@@ -19,6 +19,7 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
     private var searchOverlayField: NSTextField?
     private var searchOverlayRect: CGRect?
     private var inputBuffer: String = ""
+    public var previewService: PreviewService?
     public var onQueryUpdate: ((String) -> Void)?
     public var onSearchOverlayVisibleChanged: ((Bool) -> Void)?
     public var onShowSearchPopover: ((String?) -> Void)?
@@ -28,6 +29,7 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
     public var onArrowUp: (() -> Void)?
     public var onArrowDown: (() -> Void)?
     public var onEnter: (() -> Void)?
+    public var onSpace: (() -> Void)?
     public var onShown: (() -> Void)?
     private var isSearchActive: Bool = false
     public func setSearchActive(_ active: Bool) { isSearchActive = active }
@@ -120,10 +122,12 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
         // 安装失焦与外部点击自动隐藏行为
         installHidingBehavior()
         installEventTap()
+        ensureEventTapActive()
         imeField?.stringValue = ""
         onShown?()
     }
     public func hide(animated: Bool = true) {
+        previewService?.close()
         guard let w = window else { return }
         if !animated {
             w.orderOut(nil)
@@ -194,6 +198,9 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
             // 全局监听鼠标点击以便面板自动隐藏
             outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
                 guard let self = self else { return }
+                let p = NSEvent.mouseLocation
+                if let w = self.window, w.isVisible, w.frame.contains(p) { return }
+                if let pf = self.previewService?.windowFrame(), pf.contains(p) { return }
                 if self.window?.isVisible == true { self.hide() }
             }
         }
@@ -215,8 +222,14 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
             if type == .keyDown {
                 let keycode = event.getIntegerValueField(.keyboardEventKeycode)
                 if keycode == 57 || keycode == 102 || keycode == 104 { return Unmanaged.passUnretained(event) }
+                if keycode == 49 {
+                    if ctrl.isFirstResponderTextInput() || ctrl.isAnyTextInputActive() || ctrl.isSearchActive { return Unmanaged.passUnretained(event) }
+                    ctrl.onSpace?()
+                    return nil
+                }
                 if keycode == 53 {
                     if ctrl.isSearchActive { ctrl.onHideSearchPopover?(); return nil }
+                    if ctrl.previewService?.isVisible() == true { ctrl.previewService?.close(); return nil }
                     ctrl.hide();
                     return nil
                 }
@@ -258,6 +271,13 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
         } else {
             showToast("需要输入监控权限")
         }
+    }
+    private func ensureEventTapActive() {
+        if eventTap == nil || eventRunLoopSource == nil {
+            installEventTap()
+            return
+        }
+        if let tap = eventTap { CGEvent.tapEnable(tap: tap, enable: true) }
     }
     public func contentWidth() -> CGFloat {
         if let w = window { return w.frame.size.width }
@@ -416,5 +436,8 @@ public final class PanelWindowController: NSObject, NSWindowDelegate, NSTextFiel
             self.toastWindow?.orderOut(nil)
             self.toastWindow = nil
         }
+    }
+    public func showPreview(_ item: ClipItem) {
+        previewService?.show(item)
     }
 }

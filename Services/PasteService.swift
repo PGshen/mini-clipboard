@@ -38,6 +38,12 @@ public final class PasteService: PasteServiceProtocol {
                     } else {
                         pb.setString(item.text ?? "", forType: .string)
                     }
+                } else if item.metadata["rich"] == "html" {
+                    if let u = item.contentRef, let d = try? Data(contentsOf: u), let a = try? NSAttributedString(data: d, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
+                        pb.setString(a.string, forType: .string)
+                    } else {
+                        pb.setString(item.text ?? "", forType: .string)
+                    }
                 } else if let u = item.contentRef, let s = try? String(contentsOf: u) {
                     pb.setString(s, forType: .string)
                 } else {
@@ -51,9 +57,26 @@ public final class PasteService: PasteServiceProtocol {
         switch item.type {
         case .text:
             if let u = item.contentRef, item.metadata["rich"] == "rtf" {
-                if let d = try? Data(contentsOf: u) { pb.setData(d, forType: .rtf) }
-                else if let a = try? NSAttributedString(url: u, options: [:], documentAttributes: nil) { pb.setString(a.string, forType: .string) }
+                if let d = try? Data(contentsOf: u) { 
+                    pb.setData(d, forType: .rtf)
+                    if let a = try? NSAttributedString(url: u, options: [:], documentAttributes: nil) { pb.setString(a.string, forType: .string) } else { pb.setString(item.text ?? "", forType: .string) }
+                } else if let a = try? NSAttributedString(url: u, options: [:], documentAttributes: nil) { pb.setString(a.string, forType: .string) }
                 else { pb.setString(item.text ?? "", forType: .string) }
+            } else if let u = item.contentRef, item.metadata["rich"] == "html" {
+                if let d = try? Data(contentsOf: u) {
+                    pb.setData(d, forType: .html)
+                    if item.metadata["plainSource"] == "pb", let t = item.text { 
+                        pb.setString(t, forType: .string)
+                    } else if let a = try? NSAttributedString(data: d, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
+                        pb.setString(a.string, forType: .string)
+                        let range = NSRange(location: 0, length: a.length)
+                        if let r = a.rtf(from: range, documentAttributes: [:]) { pb.setData(r, forType: .rtf) }
+                    } else { 
+                        pb.setString(item.text ?? "", forType: .string)
+                    }
+                } else {
+                    pb.setString(item.text ?? "", forType: .string)
+                }
             } else if let u = item.contentRef, let s = try? String(contentsOf: u) {
                 pb.setString(s, forType: .string)
             } else {

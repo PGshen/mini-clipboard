@@ -5,6 +5,7 @@ final class AppController: ObservableObject {
     let store: IndexStore
     let monitor: ClipboardMonitor
     let paste: PasteService
+    let preview: PreviewService
     let hotkeys: HotkeyService
     let panel: PanelWindowController
     @Published var items: [ClipItem] = []
@@ -23,6 +24,7 @@ final class AppController: ObservableObject {
         monitor = ClipboardMonitor()
         paste = PasteService()
         hotkeys = HotkeyService()
+        preview = PreviewService()
         panel = PanelWindowController()
         search = SearchService(store: store)
         if let bid = Bundle.main.bundleIdentifier { monitor.setIgnoredApps([bid]) }
@@ -59,6 +61,13 @@ final class AppController: ObservableObject {
         panel.onArrowUp = { [weak self] in self?.moveSelectionUp() }
         panel.onArrowDown = { [weak self] in self?.moveSelectionDown() }
         panel.onEnter = { [weak self] in self?.confirmSelectionAndPaste() }
+        panel.previewService = preview
+        panel.onSpace = { [weak self] in
+            guard let self = self else { return }
+            if let id = self.selectedItemID, let item = self.items.first(where: { $0.id == id }) {
+                self.panel.showPreview(item)
+            }
+        }
         $searchPopoverVisible
             .sink { [weak self] v in self?.panel.setSearchActive(v) }
             .store(in: &cancellables)

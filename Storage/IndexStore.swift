@@ -71,12 +71,23 @@ public final class IndexStore: IndexStoreProtocol {
         }
     }
     private func itemMatches(_ item: ClipItem, qs: String) -> Bool {
-        if (item.text?.lowercased().contains(qs) ?? false) { return true }
-        if (item.metadata["url"]?.lowercased().contains(qs) ?? false) { return true }
+        if matches(hay: item.text?.lowercased(), needle: qs) { return true }
+        if matches(hay: item.metadata["url"]?.lowercased(), needle: qs) { return true }
         if item.type == .text, let u = item.contentRef, let s = try? String(contentsOf: u) {
-            return s.lowercased().contains(qs)
+            if matches(hay: s.lowercased(), needle: qs) { return true }
         }
         return false
+    }
+
+    private func matches(hay: String?, needle: String) -> Bool {
+        guard let h = hay, !h.isEmpty else { return false }
+        if needle.count < 3 {
+            let seps = CharacterSet.whitespacesAndNewlines.union(.punctuationCharacters)
+            let tokens = h.components(separatedBy: seps).filter { !$0.isEmpty }
+            for t in tokens { if t == needle || t.hasPrefix(needle) { return true } }
+            return false
+        }
+        return h.contains(needle)
     }
     public func pin(_ id: UUID, to boardID: UUID) throws {
         queue.sync {

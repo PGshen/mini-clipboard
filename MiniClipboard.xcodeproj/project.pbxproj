@@ -30,6 +30,7 @@
 		A100001015 /* PanelRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000205 /* PanelRootView.swift */; };
 		A100001016 /* WindowDragHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000206 /* WindowDragHandle.swift */; };
 		A100001017 /* ShortcutRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000207 /* ShortcutRecorder.swift */; };
+		A10000101A /* PreviewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000307 /* PreviewService.swift */; };
 		A100001018 /* public in Resources */ = {isa = PBXBuildFile; fileRef = A100000F10 /* public */; };
 		A100001019 /* logo.icns in Resources */ = {isa = PBXBuildFile; fileRef = A100000F11 /* logo.icns */; };
 /* End PBXBuildFile section */
@@ -53,6 +54,7 @@
 		A100000304 /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
 		A100000305 /* PrivacyRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyRules.swift; sourceTree = "<group>"; };
 		A100000306 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
+		A100000307 /* PreviewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewService.swift; sourceTree = "<group>"; };
 		A100000401 /* IndexStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexStore.swift; sourceTree = "<group>"; };
 		A100000402 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		A100000501 /* ClipItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipItem.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				A100000304 /* SearchService.swift */,
 				A100000305 /* PrivacyRules.swift */,
 				A100000306 /* Protocols.swift */,
+				A100000307 /* PreviewService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -244,6 +247,7 @@
 				A100001015 /* PanelRootView.swift in Sources */,
 				A100001016 /* WindowDragHandle.swift in Sources */,
 				A100001017 /* ShortcutRecorder.swift in Sources */,
+				A10000101A /* PreviewService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

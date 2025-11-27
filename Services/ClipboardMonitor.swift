@@ -74,6 +74,24 @@ public final class ClipboardMonitor: ClipboardMonitorProtocol {
                 }
             }
         }
+        // HTML 富文本
+        if types.contains(.html), let d = pb.data(forType: .html) {
+            let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("html")
+            try? d.write(to: tmp)
+            var plainText = pb.string(forType: .string)
+            if plainText == nil {
+                if let a = try? NSAttributedString(data: d, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
+                    plainText = a.string
+                }
+            }
+            var m: [String: String] = [:]
+            if let bid = bundleID { m["bundleID"] = bid }
+            m["rich"] = "html"
+            m["plainSource"] = (plainText != nil) ? "pb" : "derived"
+            let item = ClipItem(type: .text, contentRef: tmp, text: plainText, sourceApp: appName, metadata: m)
+            DispatchQueue.main.async { self.onItemCaptured?(item) }
+            return
+        }
         // 富文本（优先于纯文本）
         if let objs = pb.readObjects(forClasses: [NSAttributedString.self], options: nil) as? [NSAttributedString], let attr = objs.first, !attr.string.isEmpty {
             let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("rtf")
