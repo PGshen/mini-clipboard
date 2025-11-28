@@ -117,7 +117,13 @@ private struct PreviewContentView: View {
     @ViewBuilder private var content: some View {
         switch item.type {
         case .text:
-            ScrollView { Text(item.text ?? "") .font(.system(size: 13)) .textSelection(.enabled) }
+            let s = item.text ?? ""
+            if s.count > 50000 {
+                LargeTextView(text: s)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView { Text(s).font(.system(size: 13)).textSelection(.enabled) }
+            }
         case .link:
             let s = item.metadata["url"] ?? item.text ?? ""
             if let u = URL(string: s) { Link(destination: u) { Text(u.absoluteString).font(.system(size: 13)) } }
@@ -153,5 +159,44 @@ private struct PreviewContentView: View {
             return Color(red: r, green: g, blue: b)
         }
         switch v { case "red": return .red; case "orange": return .orange; case "yellow": return .yellow; case "green": return .green; case "blue": return .blue; case "indigo": return .indigo; case "purple": return .purple; case "pink": return .pink; default: return .accentColor }
+    }
+}
+
+private struct LargeTextView: NSViewRepresentable {
+    let text: String
+    func makeNSView(context: Context) -> NSScrollView {
+        let scroll = NSScrollView()
+        scroll.hasVerticalScroller = true
+        scroll.hasHorizontalScroller = false
+        scroll.drawsBackground = false
+        scroll.borderType = .noBorder
+        let tv = NSTextView()
+        tv.isEditable = false
+        tv.isSelectable = true
+        tv.drawsBackground = false
+        tv.isRichText = false
+        tv.font = NSFont.systemFont(ofSize: 13)
+        tv.isContinuousSpellCheckingEnabled = false
+        tv.isGrammarCheckingEnabled = false
+        tv.smartInsertDeleteEnabled = false
+        tv.isAutomaticQuoteSubstitutionEnabled = false
+        tv.isAutomaticDashSubstitutionEnabled = false
+        tv.isAutomaticTextReplacementEnabled = false
+        tv.isAutomaticSpellingCorrectionEnabled = false
+        tv.usesFindBar = false
+        tv.importsGraphics = false
+        tv.allowsImageEditing = false
+        tv.textContainerInset = NSSize(width: 0, height: 0)
+        tv.textContainer?.widthTracksTextView = true
+        tv.textContainer?.heightTracksTextView = false
+        tv.layoutManager?.allowsNonContiguousLayout = true
+        tv.string = text
+        scroll.documentView = tv
+        return scroll
+    }
+    func updateNSView(_ scroll: NSScrollView, context: Context) {
+        if let tv = scroll.documentView as? NSTextView {
+            if tv.string != text { tv.string = text }
+        }
     }
 }
