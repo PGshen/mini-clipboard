@@ -53,3 +53,7 @@
 "panel.color.hexPlaceholder" = "Hex, e.g. #FF8800";
 
 "boards.default.displayName" = "Clipboard";
+"preview.json.format" = "Format JSON";
+"preview.json.unformat" = "Unformat";
+"preview.time.convert" = "Convert Time";
+"preview.time.undo" = "Undo Conversion";

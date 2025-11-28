@@ -53,3 +53,7 @@
 "panel.color.hexPlaceholder" = "十六进制，例如 #FF8800";
 
 "boards.default.displayName" = "剪贴板";
+"preview.json.format" = "格式化 JSON";
+"preview.json.unformat" = "取消格式化";
+"preview.time.convert" = "转换时间";
+"preview.time.undo" = "取消转换";
