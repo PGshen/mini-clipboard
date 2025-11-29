@@ -14,6 +14,7 @@ final class AppController: ObservableObject {
     @Published var boards: [Pinboard] = []
     @Published var selectedBoardID: UUID?
     @Published var selectedItemID: UUID?
+    @Published var selectionByKeyboard: Bool = false
     @Published var searchPopoverVisible: Bool = false
     @Published var searchBarWidth: CGFloat = 0
     @Published var sidebarWidth: CGFloat = 180
@@ -134,6 +135,7 @@ final class AppController: ObservableObject {
         refresh()
     }
     func selectItem(_ item: ClipItem) {
+        selectionByKeyboard = false
         selectedItemID = item.id
     }
     private func selectFirstItemIfNeeded() {
@@ -167,15 +169,18 @@ final class AppController: ObservableObject {
         guard !items.isEmpty else { return }
         if layoutStyle() == .grid {
             let idx = currentIndex() ?? 0
+            selectionByKeyboard = true
             setIndex(idx - 1)
         } else {
             let idx = currentIndex() ?? 0
+            selectionByKeyboard = true
             setIndex(idx - 1)
         }
     }
     private func moveSelectionRight() {
         guard !items.isEmpty else { return }
         let idx = currentIndex() ?? 0
+        selectionByKeyboard = true
         setIndex(idx + 1)
     }
     private func moveSelectionUp() {
@@ -183,6 +188,7 @@ final class AppController: ObservableObject {
         if layoutStyle() == .grid {
             let cols = estimatedGridColumns()
             let idx = currentIndex() ?? 0
+            selectionByKeyboard = true
             setIndex(idx - cols)
         }
     }
@@ -191,6 +197,7 @@ final class AppController: ObservableObject {
         if layoutStyle() == .grid {
             let cols = estimatedGridColumns()
             let idx = currentIndex() ?? 0
+            selectionByKeyboard = true
             setIndex(idx + cols)
         }
     }
